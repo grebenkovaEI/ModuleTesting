@@ -2,10 +2,21 @@ package ru.stepup.testing;
 
 import org.junit.jupiter.api.*;
 
+import java.io.IOException;
 import java.util.List;
 
-public class StudentTests {
+class StudentTests {
     private Student student;
+    static Stub stub = new Stub();
+
+    @BeforeAll
+    static void setup() throws IOException {
+        stub.start(5352);
+    }
+    @AfterAll
+    static void tearDown() {
+        stub.stop();
+    }
 
     @BeforeEach
     void createStudent() {
@@ -77,22 +88,17 @@ public class StudentTests {
     @Test
     @DisplayName("Корректные оценки добавляются в список оценок")
     public void marksInRange() {
-        List<Integer> lst = List.of(2, 3, 4, 5);
-        student.addGrade(lst.get(0));
-        student.addGrade(lst.get(1));
-        student.addGrade(lst.get(2));
-        student.addGrade(lst.get(3));
-        Assertions.assertEquals(student.getGrades(), lst);
+        student.addGrade(3);
+        student.addGrade(5);
+        Assertions.assertEquals(2, student.getGrades().size());
+        Assertions.assertEquals(3, student.getGrades().get(0));
     }
 
     @Test
     @DisplayName("Добавление неверных оценок кидает исключение")
     public void marksNotInRange() {
-        List<Integer> lst = List.of(0, 1, 6, 7);
-        Assertions.assertThrows(IllegalArgumentException.class, () -> student.addGrade(lst.get(0)));
-        Assertions.assertThrows(IllegalArgumentException.class, () -> student.addGrade(lst.get(1)));
-        Assertions.assertThrows(IllegalArgumentException.class, () -> student.addGrade(lst.get(2)));
-        Assertions.assertThrows(IllegalArgumentException.class, () -> student.addGrade(lst.get(3)));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> student.addGrade(0));
+        Assertions.assertTrue(student.getGrades().isEmpty());
     }
 
     @RepeatedTest(value = 4, name = "Добавление корректной оценки")

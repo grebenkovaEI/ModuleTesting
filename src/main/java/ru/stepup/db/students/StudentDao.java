@@ -18,4 +18,18 @@ public class StudentDao extends BaseMainDao {
                 .list()
         );
     }
+
+    public StudentEntity findStudentByName(String name) {
+        String query = """
+                SELECT *
+                FROM STUDENTS
+                WHERE NAME = :name
+                """;
+
+        return jdbi.withHandle(handle -> handle.createQuery(query)
+                .bind("name", name)
+                .mapToBean(StudentEntity.class)
+                .one()
+        );
+    }
 }

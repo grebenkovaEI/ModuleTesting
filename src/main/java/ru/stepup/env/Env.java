@@ -9,7 +9,7 @@ import ru.stepup.env.config.db.DbConfig;
 public class Env {
 
     public static final class DB {
-        public  static final DbConfig DB_CONFIG = ConfigFactory.create(DbConfig.class);
+        public static final DbConfig DB_CONFIG = ConfigFactory.create(DbConfig.class);
     }
     public static final class API {
         public  static final ApiConfig API_CONFIG = ConfigFactory.create(ApiConfig.class);

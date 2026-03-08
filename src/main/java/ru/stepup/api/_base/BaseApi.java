@@ -17,6 +17,7 @@ import java.util.List;
 public class BaseApi {
 
     protected final ApiConfig CONFIG;
+    protected final String URL = "http://localhost:8080/";
 
     protected RequestSpecification jsonAutoAuth() {
         return  buildRequest(ContentType.JSON);
@@ -27,7 +28,8 @@ public class BaseApi {
                 .config(creatrConfig())
                 .relaxedHTTPSValidation()
                 .contentType(contentType)
-                .baseUri(CONFIG.url())
+                //.baseUri(CONFIG.url())
+                .baseUri(URL)
                 .filters(getFilters());
     }
 

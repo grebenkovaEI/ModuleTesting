@@ -16,9 +16,12 @@ public class DataSourceProvider {
 
         HikariConfig hikariConfig = new HikariConfig();
 
-        hikariConfig.setJdbcUrl(config.h2JdbcUrl());
-        hikariConfig.setUsername(config.user());
-        hikariConfig.setPassword(config.password());
+//        hikariConfig.setJdbcUrl(config.h2JdbcUrl());
+        hikariConfig.setJdbcUrl("jdbc:h2:tcp://localhost:9092/./studentsdb");
+//        hikariConfig.setUsername(config.user());
+        hikariConfig.setUsername("sa");
+//        hikariConfig.setPassword(config.password());
+        hikariConfig.setPassword("sa");
 
         hikariConfig.setMaximumPoolSize(10);
         hikariConfig.setConnectionTimeout(30000);

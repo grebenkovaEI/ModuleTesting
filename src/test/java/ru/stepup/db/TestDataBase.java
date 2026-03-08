@@ -25,7 +25,7 @@ class TestDataBase {
             log.error("Удаление не прошло, такого студента нет");
         }
 
-        System.out.println("Что-то");
+        System.out.println("Что-то дальше");
 
 
 
@@ -33,6 +33,7 @@ class TestDataBase {
 
 
 //       List<StudentEntity> students = dao.findAllStudents();
+//        System.out.println();
 //       List<StudentDto> studentDaos = api.getAllStudents();
 //
 //       System.out.println("DAO " + students);

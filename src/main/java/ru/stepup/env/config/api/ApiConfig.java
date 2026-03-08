@@ -1,5 +1,6 @@
 package ru.stepup.env.config.api;
 
+import lombok.Value;
 import org.aeonbits.owner.Config;
 
 @Config.LoadPolicy(Config.LoadType.MERGE)

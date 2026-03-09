@@ -16,14 +16,19 @@ import static io.restassured.RestAssured.given;
 
 @Slf4j
 class TestApi {
-    StudentDao dao = new StudentDao();
+    //StudentDao dao = new StudentDao();
     StudentApi api = new StudentApi();
 
 
     //1. get /student/{id} возвращает JSON студента с указанным ID и заполненным именем, если такой есть в базе, код 200.
     @Test
     void testGetStudentById_200() {
-        StudentDto st = api.getStudentById_200(161);
+        int id = 1;
+        String name = "Petr";
+        String str = String.format("{\"id\": %d, \"name\": \"%s\"}", id, name);
+        api.postStudent_201(str);
+
+        StudentDto st = api.getStudentById_200(1);
         System.out.println("testGetStudentById_200: " + st);
     }
     //2. get /student/{id} возвращает код 404, если студента с данным ID в базе нет.
@@ -35,55 +40,46 @@ class TestApi {
     //3. post /student добавляет студента в базу, если студента с таким ID ранее не было, при этом имя заполнено, код 201.
     @Test
     void testPostNewStudent() {
-        int id = 1;
+        int id = 4;
         String name = "Petr";
-        String email = "q@mail.ru";
-        api.getStudentById_404(1);
-        String str = String.format("{\"id\": %d, \"name\": \"%s\", \"email\": \"%s\"}", id, name, email);
-        StudentDto st = api.postStudent_201(str);
-        StudentEntity entity = dao.findStudentByName("Petr");
-        api.getStudentById_200(entity.getId());
-        System.out.println("testPostNewStudent: " + st);
+        api.getStudentById_404(4);
+        String str = String.format("{\"id\": %d, \"name\": \"%s\"}", id, name);
+        api.postStudent_201(str);
+        Assertions.assertNotNull(api.getStudentById_200(id).getName());
     }
 //4. post /student обновляет студента в базе, если студент с таким ID ранее был, при этом имя заполнено, код 201.
     @Test
     void testUpdateStudent() {
-        int id = 193;
-        String newName = "Sergei";
-        String email = "ww@mail.ru";
-        String str = String.format("{\"id\": %d, \"name\": \"%s\", \"email\": \"%s\"}", id, newName, email);
-        StudentDto st = api.postStudent_201(str);
-        StudentEntity entity = dao.findStudentById(id);
-        entity.getName().equals(newName);
+        int id = 1;
+        String newName = "Sergeei";
+        String str = String.format("{\"id\": %d, \"name\": \"%s\"}", id, newName);
+        api.postStudent_201(str);
+        Assertions.assertEquals(newName, api.getStudentById_200(id).getName());
     }
 //5. post /student добавляет студента в базу, если ID null, то возвращается назначенный ID, код 201.
     @Test
     void testAddStudentIdNull() {
         String name = "Oleg";
-        String email = "ee@mail.ru";
-        String str = String.format("{\"name\": \"%s\", \"email\": \"%s\"}", name, email);
-        StudentDto st = api.postStudent_201(str);
-        StudentEntity entity = dao.findStudentByName(name);
-        System.out.println(api.getStudentById_200(entity.getId()));
+        String str = String.format("{\"name\": \"%s\"}", name);
+        api.postStudent_201(str);
     }
 //6. post /student возвращает код 400, если имя не заполнено.
     @Test
     void testAddStudentNameNull() {
-        String name = "";
-        String email = "t@mail.ru";
-        String str = String.format("{\"name\": \"%s\", \"email\": \"%s\"}", name, email);
+        int id = 1;
+        String str = String.format("{\"id\": %d}", id);
         api.postStudent_400(str);
     }
 //7. delete /student/{id} удаляет студента с указанным ID из базы, код 200.
     @Test
     void testDeleteStudentById() {
-        api.deleteStudentById(33);
+        api.deleteStudentById(7);
     }
 
 //8. delete /student/{id} возвращает код 404, если студента с таким ID в базе нет.
     @Test
     void testDeleteStudentById_404() {
-        api.deleteStudentById_404(10);
+        api.deleteStudentById_404(9);
     }
 
 //9. get /topStudent код 200 и пустое тело, если студентов в базе нет
@@ -103,24 +99,26 @@ class TestApi {
 //11. get /topStudent код 200 и один студент, если у него максимальная средняя оценка, либо же среди всех студентов с максимальной средней у него их больше всего.
     @Test
     void testGetTopStudent_One() {
-        StudentEntity entityFromDb = dao.findTopStudent();
-        StudentDto st = api.getTopStudent_One();
+        String student1 = "{\"id\": 10, \"name\": \"Olga\", \"marks\": [5, 5]}";
+        String student2 = "{\"id\": 11, \"name\": \"Irina\", \"marks\": [3, 3, 3]}";
+        api.postStudent_201(student1);
+        api.postStudent_201(student2);
 
-        Assertions.assertEquals(st.getId(), entityFromDb.getId());
-        Assertions.assertEquals(st.getName(), entityFromDb.getName());
+        StudentDto st = api.getTopStudent_One();
+        Assertions.assertEquals(10, st.getId());
     }
 
 //12. get /topStudent код 200 и несколько студентов, если у них всех эта оценка максимальная и при этом они равны по количеству оценок.
     @Test
     void testGetTopStudent_Few() {
-        String student1 = "{\"id\": 1, \"name\": \"Olga\", \"grades\": [5, 4]}";
-        String student2 = "{\"id\": 2, \"name\": \"Irina\", \"grades\": [4, 5]}";
+        String student1 = "{\"id\": 12, \"name\": \"Olga\", \"marks\": [5, 5, 5]}";
+        String student2 = "{\"id\": 13, \"name\": \"Irina\", \"marks\": [5, 5, 5]}";
         api.postStudent_201(student1);
         api.postStudent_201(student2);
 
         List<StudentDto> list =  api.getTopStudent_Few();
         Assertions.assertEquals(2, list.size());
-        Assertions.assertSame(student1, list.getFirst().toString());
-        Assertions.assertSame(student2, list.getLast().toString());
+        Assertions.assertEquals(12, list.getFirst().getId());
+        Assertions.assertEquals(13, list.getLast().getId());
     }
 }

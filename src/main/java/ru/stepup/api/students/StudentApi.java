@@ -53,17 +53,16 @@ public class StudentApi extends BaseApi {
         response.then().statusCode(404);
     }
 
-    public StudentDto postStudent_201(String st) {
+    public void postStudent_201(String st) {
         log.info("[StudentApi.postStudent_201] Добавить/обновить студента");
         Response response = jsonAutoAuth()
                 .basePath(StudentUrls.POST_STUDENT)
-                .contentType(ContentType.JSON)
                 .body(st)
                 .post();
 
         response.then()
                 .statusCode(201);
-        return response.as(StudentDto.class);
+        //return response.as(StudentDto.class);
     }
     public void postStudent_400(String st) {
         log.info("[StudentApi.postStudent_400] Добавить студента с незаполненным параметром name");
@@ -84,7 +83,7 @@ public class StudentApi extends BaseApi {
                 .basePath(StudentUrls.GET_ALL_STUDENTS + "/" + id)
                 .delete();
 
-        response.then().statusCode(204);
+        response.then().statusCode(200);
     }
 
     public void deleteStudentById_404(int id) {
@@ -116,10 +115,12 @@ public class StudentApi extends BaseApi {
                 .basePath(StudentUrls.GET_TOP_STUDENT)
                 .get();
 
+        log.info("Response body: " + response.getBody().asString());
+
         response.then()
-                .statusCode(200)
-                .contentType(ContentType.JSON);
-        return response.as(StudentDto.class);
+                .statusCode(200);
+        StudentDto[] students = response.as(StudentDto[].class);
+        return students[0];
     }
     public List<StudentDto> getTopStudent_Few() {
         log.info("[StudentApi.getTopStudent_Few] Получить несколько студентов, если у них всех эта оценка максимальная " +

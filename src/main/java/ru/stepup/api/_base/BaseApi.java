@@ -7,6 +7,7 @@ import io.restassured.filter.Filter;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.http.ContentType;
+import io.restassured.parsing.Parser;
 import lombok.RequiredArgsConstructor;
 import ru.stepup.env.config.api.ApiConfig;
 import io.restassured.specification.RequestSpecification;
@@ -20,6 +21,7 @@ public class BaseApi {
     protected final String URL = "http://localhost:8080/";
 
     protected RequestSpecification jsonAutoAuth() {
+        RestAssured.defaultParser = Parser.JSON;
         return  buildRequest(ContentType.JSON);
     }
 

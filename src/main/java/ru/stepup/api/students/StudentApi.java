@@ -3,16 +3,12 @@ package ru.stepup.api.students;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import lombok.extern.slf4j.Slf4j;
-import org.codehaus.groovy.ast.expr.UnaryMinusExpression;
 import org.hamcrest.Matchers;
 import ru.stepup.api._base.BaseApi;
 import ru.stepup.api.students.entity.response.StudentDto;
 import ru.stepup.env.Env;
-import ru.stepup.env.config.api.ApiConfig;
-
 import java.util.Arrays;
 import java.util.List;
-
 import static org.hamcrest.Matchers.notNullValue;
 
 @Slf4j
@@ -56,6 +52,31 @@ public class StudentApi extends BaseApi {
 
         response.then().statusCode(404);
     }
+
+    public StudentDto postStudent_201(String st) {
+        log.info("[StudentApi.postStudent_201] Добавить/обновить студента");
+        Response response = jsonAutoAuth()
+                .basePath(StudentUrls.POST_STUDENT)
+                .contentType(ContentType.JSON)
+                .body(st)
+                .post();
+
+        response.then()
+                .statusCode(201);
+        return response.as(StudentDto.class);
+    }
+    public void postStudent_400(String st) {
+        log.info("[StudentApi.postStudent_400] Добавить студента с незаполненным параметром name");
+        Response response = jsonAutoAuth()
+                .basePath(StudentUrls.POST_STUDENT)
+                .contentType(ContentType.JSON)
+                .body(st)
+                .post();
+
+        response.then()
+                .statusCode(400);
+    }
+
 
 
 

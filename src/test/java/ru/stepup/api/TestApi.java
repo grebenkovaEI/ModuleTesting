@@ -1,12 +1,16 @@
 package ru.stepup.api;
 
 import lombok.extern.slf4j.Slf4j;
+import org.hamcrest.Matchers;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import ru.stepup.api.students.StudentApi;
 import ru.stepup.api.students.StudentUrls;
 import ru.stepup.api.students.entity.response.StudentDto;
 import ru.stepup.db.students.StudentDao;
 import ru.stepup.db.students.entity.StudentEntity;
+
+import java.util.List;
 
 import static io.restassured.RestAssured.given;
 
@@ -63,7 +67,7 @@ class TestApi {
         System.out.println(api.getStudentById_200(entity.getId()));
     }
 //6. post /student возвращает код 400, если имя не заполнено.
-@Test
+    @Test
     void testAddStudentNameNull() {
         String name = "";
         String email = "t@mail.ru";
@@ -71,17 +75,52 @@ class TestApi {
         api.postStudent_400(str);
     }
 //7. delete /student/{id} удаляет студента с указанным ID из базы, код 200.
-
-
-
-
+    @Test
+    void testDeleteStudentById() {
+        api.deleteStudentById(33);
+    }
 
 //8. delete /student/{id} возвращает код 404, если студента с таким ID в базе нет.
-//9. get /topStudent код 200 и пустое тело, если студентов в базе нет.
-//10. get /topStudent код 200 и пустое тело, если ни у кого из студентов в базе нет оценок.
+    @Test
+    void testDeleteStudentById_404() {
+        api.deleteStudentById_404(10);
+    }
+
+//9. get /topStudent код 200 и пустое тело, если студентов в базе нет
+    @Test
+    void testTopStudent_EmptyStudents() {
+        int length = api.getTopStudent_EmptyDB();
+        Assertions.assertEquals(0, length);
+    }
+
+//10. get /topStudent код 200 и пустое тело, если ни у кого из студентов в базе нет оценок ()
+    @Test
+    void testTopStudent_EmptyGrades() {
+        int length = api.getTopStudent_EmptyDB();
+        Assertions.assertEquals(0, length);
+    }
+
 //11. get /topStudent код 200 и один студент, если у него максимальная средняя оценка, либо же среди всех студентов с максимальной средней у него их больше всего.
+    @Test
+    void testGetTopStudent_One() {
+        StudentEntity entityFromDb = dao.findTopStudent();
+        StudentDto st = api.getTopStudent_One();
+
+        Assertions.assertEquals(st.getId(), entityFromDb.getId());
+        Assertions.assertEquals(st.getName(), entityFromDb.getName());
+    }
+
 //12. get /topStudent код 200 и несколько студентов, если у них всех эта оценка максимальная и при этом они равны по количеству оценок.
+    @Test
+    void testGetTopStudent_Few() {
+        String student1 = "{\"id\": 1, \"name\": \"Olga\", \"grades\": [5, 4]}";
+        String student2 = "{\"id\": 2, \"name\": \"Irina\", \"grades\": [4, 5]}";
+        api.postStudent_201(student1);
+        api.postStudent_201(student2);
 
-
-
+        List<StudentDto> list =  api.getTopStudent_Few();
+        Assertions.assertEquals(2, list.size());
+        Assertions.assertSame(student1, list.getFirst().toString());
+        Assertions.assertSame(student2, list.getLast().toString());
+    }
 }

@@ -46,4 +46,23 @@ public class StudentDao extends BaseMainDao {
                 .one()
         );
     }
+
+    public StudentEntity findTopStudent() {
+        String query = """
+                SELECT s.ID, s.NAME, AVG(sg.GRADE) AS average_grade, COUNT(sg.GRADE) AS grade_count
+                FROM STUDENTS s
+                LEFT JOIN STUDENT_GRADES sg ON s.ID = sg.STUDENT_ID
+                GROUP BY s.ID
+                ORDER BY average_grade DESC, grade_count DESC
+                LIMIT 1
+                """;
+
+        return jdbi.withHandle(handle -> handle.createQuery(query)
+                .mapToBean(StudentEntity.class)
+                .one()
+        );
+    }
+
+
+
 }

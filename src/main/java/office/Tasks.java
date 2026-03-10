@@ -12,7 +12,9 @@ public class Tasks {
         task.findAnn();
         //2. Проверьте имена всех сотрудников. Если чьё-то имя написано с маленькой буквы, исправьте её на большую.
         // Выведите на экран количество исправленных имён.
-
+        System.out.println("2. Проверьте имена всех сотрудников. Если чьё-то имя написано с маленькой буквы, исправьте её на большую." +
+                "Выведите на экран количество исправленных имён");
+        task.checkNames();
 
 
 
@@ -43,6 +45,35 @@ public class Tasks {
         } catch (Exception e) {
             System.out.println(e);
         }
+    }
+
+
+    public void checkNames() {
+        int updatedNamesCount = 0;
+
+        try (Connection con = DriverManager.getConnection("jdbc:h2:~\\Office")) {
+            Service.createDB();
+            Statement stmt = con.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT ID, NAME FROM Employee");
+
+            while (rs.next()) {
+                int id = rs.getInt("ID");
+                String currentName = rs.getString("NAME");
+
+                if (Character.isLowerCase(currentName.charAt(0))) {
+                    String updatedName = Character.toUpperCase(currentName.charAt(0)) + currentName.substring(1);
+                    System.out.println("id " + id + ": " + currentName + " исправлено на " + updatedName);
+
+                    PreparedStatement stm = con.prepareStatement("UPDATE Employee SET NAME = ? WHERE ID = ?");
+                    stm.setString(1, updatedName);
+                    stm.setInt(2, id);
+                    updatedNamesCount++;
+                }
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        System.out.println("Количество исправленных имён: " + updatedNamesCount);
     }
 
 

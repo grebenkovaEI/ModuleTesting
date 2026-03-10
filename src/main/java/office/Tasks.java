@@ -7,16 +7,13 @@ import java.util.List;
 public class Tasks {
     public static void main(String[] args) {
         Tasks task = new Tasks();
-        //1. Найдите ID сотрудника с именем Ann. Если такой сотрудник только один, то установите его департамент в HR.
         System.out.println("1. Найдите ID сотрудника с именем Ann. Если такой сотрудник только один, то установите его департамент в HR.");
         task.findAnn();
-        //2. Проверьте имена всех сотрудников. Если чьё-то имя написано с маленькой буквы, исправьте её на большую.
-        // Выведите на экран количество исправленных имён.
         System.out.println("2. Проверьте имена всех сотрудников. Если чьё-то имя написано с маленькой буквы, исправьте её на большую." +
                 "Выведите на экран количество исправленных имён");
         task.checkNames();
-
-
+        System.out.println("3. Выведите на экран количество сотрудников в IT-отделе");
+        task.countItEmployees();
 
 
 
@@ -76,6 +73,21 @@ public class Tasks {
         System.out.println("Количество исправленных имён: " + updatedNamesCount);
     }
 
+    public void countItEmployees() {
+        int countItEmployee = 0;
 
+        try (Connection con = DriverManager.getConnection("jdbc:h2:~\\Office")) {
+            Service.createDB();
+            PreparedStatement stm = con.prepareStatement("SELECT COUNT(Employee.ID) FROM Employee JOIN Department ON Employee.DepartmentID = Department.ID WHERE Department.NAME = ?");
+            stm.setString(1, "IT");
+            ResultSet rs = stm.executeQuery();
+                if (rs.next()) {
+                 countItEmployee = rs.getInt(1);
+                }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        System.out.println("Количество сотрудников в IT-отделе: " + countItEmployee);
+    }
 
 }

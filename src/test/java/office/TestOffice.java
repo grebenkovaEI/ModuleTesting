@@ -76,6 +76,7 @@ class TestOffice {
                 }
             }
             Assertions.assertEquals(0, countEmp, "Сотрудники не были удалены. Требование не выполнено");
+            System.out.println("Сотрудники успешно удалены");
         } catch (Exception e) {
             System.out.println(e);
         }
